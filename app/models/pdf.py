@@ -6,17 +6,16 @@ from datetime import datetime
  
 class PDFUploadResponse(BaseModel):
     """Returned after a PDF is successfully uploaded"""
-    pdf_id: str          # unique ID we generate for this PDF
-    filename: str        # original filename e.g. "document.pdf"
-    message: str         # e.g. "PDF uploaded and indexed successfully"
+    pdf_id: str           
+    filename: str         
+    message: str          
  
  
 class PDFListItem(BaseModel):
     """One item in the list of uploaded PDFs"""
     pdf_id: str
     filename: str
-    uploaded_at: str     # ISO format datetime string e.g. "2024-01-15T10:30:00"
- 
+    uploaded_at: str      
  
 class PDFListResponse(BaseModel):
     """Returned when user asks for all uploaded PDFs"""

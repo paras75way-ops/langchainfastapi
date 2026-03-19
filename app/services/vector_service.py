@@ -47,7 +47,7 @@ def add_to_vectorstore(pdf_id: str, file_path: str, filename: str):
     for i, chunk in enumerate(chunks):
         db.add_documents([chunk])
         print(f"Embedded chunk {i+1}/{len(chunks)}")
-        time.sleep(0.5)   # 0.5s delay between each chunk
+        time.sleep(0.5)    
 
     print(f"✅ Done embedding PDF: {filename}")
 

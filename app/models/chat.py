@@ -5,13 +5,13 @@ from datetime import datetime
 
 class ChatRequest(BaseModel):
     """What the user sends when asking a question"""
-    question: str        # e.g. "What is the refund policy?"
+    question: str        
  
  
 class SourceInfo(BaseModel):
     """Info about which part of which PDF the answer came from"""
-    filename: str        # which PDF
-    page: int            # which page number
+    filename: str        
+    page: int            
  
  
 class ChatResponse(BaseModel):

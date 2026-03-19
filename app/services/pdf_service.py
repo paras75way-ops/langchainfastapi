@@ -4,18 +4,12 @@ import uuid
 from datetime import datetime
 from fastapi import UploadFile
 
-# ───────────────────────────────────────────
-# Constants — where files and registry live
-# ───────────────────────────────────────────
-
+ 
 UPLOAD_DIR = "uploads"
 REGISTRY_FILE = "pdfs.json"
 
 
-# ───────────────────────────────────────────
-# Registry Helpers
-# These functions read/write pdfs.json
-# ───────────────────────────────────────────
+ 
 
 def load_registry() -> dict:
     """Read pdfs.json and return its contents as a dict.
@@ -59,7 +53,7 @@ async def save_pdf(file: UploadFile) -> dict:
     with open(file_path, "wb") as f:
         f.write(contents)
 
-    # Step 3: Add entry to registry
+    
     registry = load_registry()
     registry["pdfs"][pdf_id] = {
         "pdf_id": pdf_id,
@@ -69,7 +63,7 @@ async def save_pdf(file: UploadFile) -> dict:
     }
     save_registry(registry)
 
-    # Step 4: Return the info
+ 
     return registry["pdfs"][pdf_id]
 
 
@@ -99,12 +93,12 @@ def delete_pdf(pdf_id: str) -> dict:
 
     pdf_info = registry["pdfs"][pdf_id]
 
-    # Step 2: Delete file from disk
+ 
     file_path = pdf_info["file_path"]
     if os.path.exists(file_path):
         os.remove(file_path)
 
-    # Step 3: Remove from registry
+  
     del registry["pdfs"][pdf_id]
     save_registry(registry)
 
