@@ -82,11 +82,10 @@ def delete_pdf(pdf_id: str) -> dict:
     3. Remove the entry from pdfs.json
     4. Return the deleted pdf info
     """
-
-    # Step 1: Check if it exists
+ 
     registry = load_registry()
     if pdf_id not in registry["pdfs"]:
-        return None   # caller will handle 404
+        return None    
 
     pdf_info = registry["pdfs"][pdf_id]
 
