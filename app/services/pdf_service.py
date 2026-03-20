@@ -26,9 +26,7 @@ def save_registry(registry: dict):
         json.dump(registry, f, indent=2)
 
 
-# ───────────────────────────────────────────
-# Core PDF Service Functions
-# ───────────────────────────────────────────
+ 
 
 async def save_pdf(file: UploadFile) -> dict:
     """
@@ -41,14 +39,13 @@ async def save_pdf(file: UploadFile) -> dict:
     4. Return the pdf info
     """
 
-    # Step 1: Generate a unique ID e.g. "a1b2c3d4"
+     
     pdf_id = str(uuid.uuid4())[:8]
 
-    # Step 2: Build the file path and save the file
+ 
     os.makedirs(UPLOAD_DIR, exist_ok=True)
     file_path = os.path.join(UPLOAD_DIR, f"{pdf_id}.pdf")
-
-    # Read uploaded file contents and write to disk
+ 
     contents = await file.read()
     with open(file_path, "wb") as f:
         f.write(contents)
@@ -57,8 +54,8 @@ async def save_pdf(file: UploadFile) -> dict:
     registry = load_registry()
     registry["pdfs"][pdf_id] = {
         "pdf_id": pdf_id,
-        "filename": file.filename,       # original name e.g. "resume.pdf"
-        "file_path": file_path,          # where it's stored on disk
+        "filename": file.filename,        
+        "file_path": file_path,           
         "uploaded_at": datetime.now().isoformat()
     }
     save_registry(registry)

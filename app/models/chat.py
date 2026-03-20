@@ -16,7 +16,7 @@ class SourceInfo(BaseModel):
  
 class ChatResponse(BaseModel):
     """What we return after answering the question"""
-    question: str        # echo back the original question
-    answer: str          # the LLM generated answer
-    sources: List[SourceInfo]  # which PDFs/pages were used
+    question: str        
+    answer: str          
+    sources: List[SourceInfo]  
  

@@ -20,12 +20,12 @@ class PDFListItem(BaseModel):
 class PDFListResponse(BaseModel):
     """Returned when user asks for all uploaded PDFs"""
     pdfs: List[PDFListItem]
-    total: int           # total count of PDFs
+    total: int           
  
  
 class PDFDeleteResponse(BaseModel):
     """Returned after a PDF is deleted"""
     pdf_id: str
-    message: str         # e.g. "PDF deleted successfully"
+    message: str          
  
  

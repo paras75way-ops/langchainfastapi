@@ -1,31 +1,25 @@
 import os
 from dotenv import load_dotenv
 from fastapi import APIRouter, HTTPException
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from app.models.chat import ChatRequest, ChatResponse, SourceInfo
 from app.services.vector_service import query_vectorstore
-
+ 
 load_dotenv()
 
 router = APIRouter()
-
-# ───────────────────────────────────────────
-# Gemini LLM setup
-# We use gemini-1.5-flash — fast and free tier available
-# ───────────────────────────────────────────
-
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    google_api_key=os.getenv("GEMINI_API_KEY"),
-    temperature=0.3   # lower = more factual, less creative
+ 
+ 
+llm = ChatGroq(
+    model="llama-3.1-8b-instant",
+    api_key=os.getenv("GROQ_API_KEY"),
+    temperature=0.7,
+ 
 )
 
-
-# ───────────────────────────────────────────
-# POST /chat/ask
-# ───────────────────────────────────────────
+ 
 
 @router.post("/ask", response_model=ChatResponse)
 def ask_question(request: ChatRequest):
@@ -36,12 +30,11 @@ def ask_question(request: ChatRequest):
     1. Search Chroma for relevant chunks
     2. If no chunks found, tell user to upload PDFs
     3. Build a prompt with chunks as context
-    4. Call Gemini LLM
+    4. Call grok LLM
     5. Return answer + sources
     """
 
-    # Step 1: Find relevant chunks from Chroma
-    # This embeds the question and finds top 4 similar chunks
+    
     chunks = query_vectorstore(request.question, k=4)
 
     # Step 2: If no PDFs uploaded yet, return early
@@ -62,17 +55,16 @@ def ask_question(request: ChatRequest):
         context += chunk.page_content
         context += "\n"
 
-    # Step 4: Build the prompt
-    # System message tells LLM to ONLY use the provided context
-    # This is what keeps answers grounded in your PDFs only
-    system_prompt = """You are a helpful assistant that answers questions 
-strictly based on the provided document context.
+    system_prompt = """You are a helpful AI assistant.
 
-Rules:
-- Only use information from the context below to answer
-- If the answer is not in the context, say "I could not find this information in the uploaded documents"
-- Be concise and accurate
-- Mention which document the answer came from"""
+You MUST answer using ONLY the provided context.
+
+Instructions:
+- If the answer is present in the context, you MUST answer it.
+- Do NOT say "not found" if the answer exists even partially.
+- Only say "I could not find this information in the uploaded documents" if the answer is completely missing.
+- Be precise and use the exact information from context.
+- Always include supporting details from the context."""
 
     user_prompt = f"""Context from uploaded documents:
 {context}
@@ -81,7 +73,7 @@ Question: {request.question}
 
 Answer:"""
 
-    # Step 5: Call Gemini LLM with the prompt
+    
     messages = [
         SystemMessage(content=system_prompt),
         HumanMessage(content=user_prompt)
@@ -90,8 +82,7 @@ Answer:"""
     response = llm.invoke(messages)
     answer = response.content
 
-    # Step 6: Build sources list from chunk metadata
-    # Deduplicate — same file+page shouldn't appear twice
+    
     seen = set()
     sources = []
     for chunk in chunks:
@@ -102,10 +93,10 @@ Answer:"""
             seen.add(key)
             sources.append(SourceInfo(
                 filename=filename,
-                page=page + 1   # convert 0-indexed to 1-indexed
+                page=page + 1   
             ))
 
-    # Step 7: Return the full response
+
     return ChatResponse(
         question=request.question,
         answer=answer,
