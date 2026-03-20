@@ -36,17 +36,14 @@ def ask_question(request: ChatRequest):
 
     
     chunks = query_vectorstore(request.question, k=4)
-
-    # Step 2: If no PDFs uploaded yet, return early
+ 
     if not chunks:
         raise HTTPException(
             status_code=404,
             detail="No documents found. Please upload PDF files first."
         )
 
-    # Step 3: Build context string from chunks
-    # We combine all chunk texts into one big context block
-    # Each chunk also tells us which file and page it came from
+   
     context = ""
     for i, chunk in enumerate(chunks):
         filename = chunk.metadata.get("filename", "unknown")
